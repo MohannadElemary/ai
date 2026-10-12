@@ -115,10 +115,15 @@ class OpenRouterGateway implements Gateway, RerankingGateway, StepTextGateway
         ?int $timeout = null,
         array $providerOptions = [],
     ): ImageResponse {
+        $imageConfig = Arr::pull($providerOptions, 'image_config', []);
+
         $response = $this->withErrorHandling(
             $provider->name(),
             fn () => $this->client($provider, $timeout ?? 120)
                 ->post('images', array_merge($providerOptions, array_filter([
+                    'aspect_ratio' => $imageConfig['aspect_ratio'] ?? null,
+                    'resolution' => $imageConfig['image_size'] ?? null,
+                ]), array_filter([
                     'model' => $model,
                     'prompt' => $prompt,
                     ...$provider->defaultImageOptions($size, $quality),

@@ -46,16 +46,54 @@ test('image request is sent to the images endpoint with model and prompt', funct
     });
 });
 
-test('image request maps size to aspect_ratio and quality to quality', function (): void {
+test('image request maps size to aspect_ratio', function (): void {
     Http::fake(['openrouter.ai/*' => fakeOpenRouterImageResponse()]);
 
-    Image::of('A sunset')->landscape()->quality('high')->generate(provider: 'openrouter', model: 'google/gemini-2.5-flash-image');
+    Image::of('A sunset')->landscape()->generate(provider: 'openrouter', model: 'google/gemini-2.5-flash-image');
+
+    Http::assertSent(fn (Request $request): bool => json_decode($request->body(), true)['aspect_ratio'] === '3:2');
+});
+
+test('image request maps quality to resolution', function (string $quality, string $expectedResolution): void {
+    Http::fake(['openrouter.ai/*' => fakeOpenRouterImageResponse()]);
+
+    Image::of('A sunset')->quality($quality)->generate(provider: 'openrouter', model: 'google/gemini-2.5-flash-image');
+
+    Http::assertSent(fn (Request $request): bool => json_decode($request->body(), true)['resolution'] === $expectedResolution);
+})->with([
+    'low maps to 1K' => ['low', '1K'],
+    'medium maps to 2K' => ['medium', '2K'],
+    'high maps to 4K' => ['high', '4K'],
+]);
+
+test('image_config provider options are sent as top level image fields', function (): void {
+    Http::fake(['openrouter.ai/*' => fakeOpenRouterImageResponse()]);
+
+    Image::of('A sunset')
+        ->withProviderOptions(['image_config' => ['aspect_ratio' => '21:9', 'image_size' => '2K']])
+        ->generate(provider: 'openrouter', model: 'google/gemini-2.5-flash-image');
+
+    Http::assertSent(fn (Request $request): bool => json_decode($request->body(), true) === [
+        'aspect_ratio' => '21:9',
+        'resolution' => '2K',
+        'model' => 'google/gemini-2.5-flash-image',
+        'prompt' => 'A sunset',
+    ]);
+});
+
+test('image size and quality take precedence over image_config provider options', function (): void {
+    Http::fake(['openrouter.ai/*' => fakeOpenRouterImageResponse()]);
+
+    Image::of('A sunset')
+        ->landscape()
+        ->quality('high')
+        ->withProviderOptions(['image_config' => ['aspect_ratio' => '21:9', 'image_size' => '1K']])
+        ->generate(provider: 'openrouter', model: 'google/gemini-2.5-flash-image');
 
     Http::assertSent(function (Request $request): bool {
         $body = json_decode($request->body(), true);
 
-        return $body['aspect_ratio'] === '3:2'
-            && $body['quality'] === 'high';
+        return $body['aspect_ratio'] === '3:2' && $body['resolution'] === '4K';
     });
 });
 

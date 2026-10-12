@@ -155,7 +155,12 @@ class OpenRouterProvider extends Provider implements AudioProvider, Classificati
     {
         return array_filter([
             'aspect_ratio' => $size,
-            'quality' => $quality,
+            'resolution' => match ($quality) {
+                'low' => '1K',
+                'medium' => '2K',
+                'high' => '4K',
+                default => null,
+            },
         ]);
     }
 
