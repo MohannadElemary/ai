@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Laravel\Ai\Contracts\Files\StorableFile;
 use Laravel\Ai\Contracts\Gateway\StoreGateway;
-use Laravel\Ai\Contracts\Gateway\UploadsDocuments;
+use Laravel\Ai\Contracts\Gateway\UploadsDocumentsToStore;
 use Laravel\Ai\Contracts\Providers\StoreProvider;
 use Laravel\Ai\Gateway\Concerns\HandlesFailoverErrors;
 use Laravel\Ai\Gateway\Concerns\PreparesStorableFiles;
@@ -15,7 +15,7 @@ use Laravel\Ai\Responses\Data\StoreFileCounts;
 use Laravel\Ai\Store;
 use RuntimeException;
 
-class MistralStoreGateway implements StoreGateway, UploadsDocuments
+class MistralStoreGateway implements StoreGateway, UploadsDocumentsToStore
 {
     use Concerns\CreatesMistralClient;
     use HandlesFailoverErrors;
