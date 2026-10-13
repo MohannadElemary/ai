@@ -7,7 +7,7 @@ use DateInterval;
 use Illuminate\Support\Collection;
 use Laravel\Ai\Contracts\Files\StorableFile;
 use Laravel\Ai\Contracts\Gateway\StoreGateway;
-use Laravel\Ai\Contracts\Gateway\UploadsDocuments;
+use Laravel\Ai\Contracts\Gateway\UploadsDocumentsToStore;
 use Laravel\Ai\Contracts\Providers\StoreProvider;
 use Laravel\Ai\Files;
 use Laravel\Ai\Responses\Data\StoreFileCounts;
@@ -15,7 +15,7 @@ use Laravel\Ai\Store;
 use Laravel\Ai\Stores;
 use RuntimeException;
 
-class FakeStoreGateway implements StoreGateway, UploadsDocuments
+class FakeStoreGateway implements StoreGateway, UploadsDocumentsToStore
 {
     protected int $currentResponseIndex = 0;
 

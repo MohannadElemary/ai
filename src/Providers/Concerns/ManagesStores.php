@@ -64,7 +64,8 @@ trait ManagesStores
     public function addFileToStore(string $storeId, HasProviderId $file, array $metadata = []): string
     {
         return $this->dispatchFileAddition(
-            $storeId, $file->id(),
+            $storeId,
+            $file->id(),
             fn () => $this->storeGateway()->addFile($this, $storeId, $file->id(), $metadata),
         );
     }
