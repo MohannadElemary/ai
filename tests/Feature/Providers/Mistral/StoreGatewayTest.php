@@ -90,7 +90,7 @@ test('get store stops paginating when the api reports no more pages', function (
 test('get store keeps paginating while the api reports more pages', function () {
     Http::fake([
         'api.mistral.ai/v1/libraries/lib-123/documents*' => function (Request $request) {
-            $page = (int) $request->uri()->query()->get('page', 0);
+            $page = (int) ($request->data()['page'] ?? 0);
 
             return Http::response([
                 'pagination' => ['total_items' => 2, 'total_pages' => 2, 'current_page' => $page, 'page_size' => 100, 'has_more' => $page === 0],
