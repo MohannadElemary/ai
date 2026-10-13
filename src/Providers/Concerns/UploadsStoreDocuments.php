@@ -3,8 +3,8 @@
 namespace Laravel\Ai\Providers\Concerns;
 
 use Laravel\Ai\Contracts\Files\StorableFile;
-use Laravel\Ai\Contracts\Gateway\StoreGateway;
-use Laravel\Ai\Contracts\Gateway\UploadsDocuments;
+use Laravel\Ai\Contracts\Gateway\UploadsDocumentsToStore;
+use LogicException;
 
 trait UploadsStoreDocuments
 {
@@ -13,11 +13,15 @@ trait UploadsStoreDocuments
      */
     public function uploadDocumentToStore(string $storeId, StorableFile $file, array $metadata = []): string
     {
-        /** @var StoreGateway&UploadsDocuments $gateway */
         $gateway = $this->storeGateway();
 
+        if (! $gateway instanceof UploadsDocumentsToStore) {
+            throw new LogicException('Store gateway ['.$gateway::class.'] does not support uploading documents directly.');
+        }
+
         return $this->dispatchFileAddition(
-            $storeId, null,
+            $storeId,
+            null,
             fn () => $gateway->uploadDocument($this, $storeId, $file, $metadata),
         );
     }
