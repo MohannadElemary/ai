@@ -35,17 +35,17 @@ class Store
             $file = LocalDocument::fromUploadedFile($file);
         }
 
-        $originalFile = $file;
-
         if ($file instanceof StorableFile && $this->provider instanceof UploadsDocumentsToStore) {
             if (Ai::storesAreFaked()) {
-                Ai::recordFileAddition($this->id, Files::fakeIdFor($file), $originalFile);
+                Ai::recordFileAddition($this->id, Files::fakeIdFor($file), $file);
             }
 
             return new AddedDocumentResponse(
                 $this->provider->uploadDocumentToStore($this->id, $file, $metadata),
             );
         }
+
+        $originalFile = $file;
 
         if ($file instanceof StorableFile) {
             $file = $this->storeFile($file);

@@ -5,7 +5,7 @@ namespace Laravel\Ai\Contracts\Gateway;
 use Laravel\Ai\Contracts\Files\StorableFile;
 use Laravel\Ai\Contracts\Providers\StoreProvider;
 
-interface UploadsDocuments
+interface UploadsDocumentsToStore
 {
     /**
      * Upload a document's contents directly into a vector store.
