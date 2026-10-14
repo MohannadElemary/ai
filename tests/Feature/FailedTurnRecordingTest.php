@@ -251,3 +251,47 @@ test('a conversation opened by a failed turn is titled the way a completed one i
 
     expect(DB::table('agent_conversations')->value('title'))->toContain('arrived at it');
 });
+
+test('a replayed interrupted call keeps the call id the Responses API pairs its output by', function (string $provider): void {
+    Config::set("ai.providers.{$provider}.key", 'test-key');
+
+    Http::fake(['*' => Http::sequence()
+        ->push([
+            'id' => 'resp_1',
+            'object' => 'response',
+            'status' => 'completed',
+            'output' => [[
+                'type' => 'function_call',
+                'id' => 'fc_1',
+                'call_id' => 'call_1',
+                'name' => 'FixedNumberGenerator',
+                'arguments' => '{}',
+                'status' => 'completed',
+            ]],
+            'usage' => ['input_tokens' => 10, 'output_tokens' => 5],
+        ])
+        ->push([
+            'id' => 'resp_2',
+            'object' => 'response',
+            'status' => 'completed',
+            'output' => [[
+                'type' => 'message',
+                'id' => 'msg_2',
+                'role' => 'assistant',
+                'content' => [['type' => 'output_text', 'text' => 'Done.', 'annotations' => []]],
+            ]],
+            'usage' => ['input_tokens' => 10, 'output_tokens' => 5],
+        ]),
+    ]);
+
+    $agent = (new RememberingFailingToolAgent)->forUser((object) ['id' => 1]);
+
+    expect(fn () => $agent->prompt('Go', provider: $provider))->toThrow(Exception::class, 'Forced to throw exception.');
+
+    (new RememberingFailingToolAgent)->continueLastConversation((object) ['id' => 1])->prompt('Again', provider: $provider);
+
+    $input = collect(json_decode((string) Http::recorded()[1][0]->body(), true)['input']);
+
+    expect($input->firstWhere('type', 'function_call')['call_id'])->toBe('call_1')
+        ->and($input->firstWhere('type', 'function_call_output')['call_id'])->toBe('call_1');
+})->with(['openai', 'xai']);
