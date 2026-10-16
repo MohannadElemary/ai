@@ -9,6 +9,7 @@ use Laravel\Ai\Contracts\Providers\FileProvider;
 use Laravel\Ai\Enums\Lab;
 use Laravel\Ai\Gateway\Concerns\HandlesFailoverErrors;
 use Laravel\Ai\Gateway\Concerns\PreparesStorableFiles;
+use Laravel\Ai\Gateway\Concerns\ValidatesResourceIds;
 use Laravel\Ai\Providers\Provider;
 use Laravel\Ai\Responses\FileResponse;
 use Laravel\Ai\Responses\StoredFileResponse;
@@ -18,6 +19,7 @@ class AnthropicFileGateway implements FileGateway
     use Concerns\CreatesAnthropicClient;
     use HandlesFailoverErrors;
     use PreparesStorableFiles;
+    use ValidatesResourceIds;
 
     /**
      * Get a file by its ID.
@@ -26,7 +28,7 @@ class AnthropicFileGateway implements FileGateway
     {
         $response = $this->withErrorHandling(
             $provider->name(),
-            fn () => $this->client($provider)->get("files/{$fileId}"),
+            fn () => $this->client($provider)->get("files/{$this->resourceId($fileId)}"),
         );
 
         return new FileResponse(
@@ -65,7 +67,7 @@ class AnthropicFileGateway implements FileGateway
     {
         $this->withErrorHandling(
             $provider->name(),
-            fn () => $this->client($provider)->delete("files/{$fileId}"),
+            fn () => $this->client($provider)->delete("files/{$this->resourceId($fileId)}"),
         );
     }
 

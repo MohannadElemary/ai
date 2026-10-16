@@ -278,6 +278,18 @@ test('remove file accepts full document path', function (): void {
         && ! str_contains((string) $request->url(), 'fileSearchStores/store123/documents/fileSearchStores/'));
 });
 
+test('removing a store reference as a document never deletes the store', function (): void {
+    Http::fake([
+        'generativelanguage.googleapis.com/*' => Http::response(fakeStoreResponse()),
+    ]);
+
+    $store = Stores::get('store123', provider: 'gemini');
+
+    expect(fn () => $store->remove('fileSearchStores/victim'))->toThrow(InvalidArgumentException::class);
+
+    Http::assertNotSent(fn ($request): bool => $request->method() === 'DELETE');
+});
+
 test('delete store sends correct request', function (): void {
     Http::fake([
         'generativelanguage.googleapis.com/*' => Http::response([], 200),

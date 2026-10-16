@@ -8,6 +8,7 @@ use Laravel\Ai\Contracts\Providers\FileProvider;
 use Laravel\Ai\Enums\Lab;
 use Laravel\Ai\Gateway\Concerns\HandlesFailoverErrors;
 use Laravel\Ai\Gateway\Concerns\PreparesStorableFiles;
+use Laravel\Ai\Gateway\Concerns\ValidatesResourceIds;
 use Laravel\Ai\Providers\Provider;
 use Laravel\Ai\Responses\FileResponse;
 use Laravel\Ai\Responses\StoredFileResponse;
@@ -17,6 +18,7 @@ class OpenRouterFileGateway implements FileGateway
     use Concerns\CreatesOpenRouterClient;
     use HandlesFailoverErrors;
     use PreparesStorableFiles;
+    use ValidatesResourceIds;
 
     /**
      * Get a file by its ID.
@@ -26,7 +28,7 @@ class OpenRouterFileGateway implements FileGateway
         $response = $this->withErrorHandling(
             $provider->name(),
             fn () => $this->client($provider)
-                ->get("files/{$fileId}")
+                ->get("files/{$this->resourceId($fileId)}")
         );
 
         return new FileResponse(
@@ -74,7 +76,7 @@ class OpenRouterFileGateway implements FileGateway
         $this->withErrorHandling(
             $provider->name(),
             fn () => $this->client($provider)
-                ->delete("files/{$fileId}")
+                ->delete("files/{$this->resourceId($fileId)}")
         );
     }
 }

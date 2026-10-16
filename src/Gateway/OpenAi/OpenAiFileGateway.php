@@ -8,6 +8,7 @@ use Laravel\Ai\Contracts\Providers\FileProvider;
 use Laravel\Ai\Enums\Lab;
 use Laravel\Ai\Gateway\Concerns\HandlesFailoverErrors;
 use Laravel\Ai\Gateway\Concerns\PreparesStorableFiles;
+use Laravel\Ai\Gateway\Concerns\ValidatesResourceIds;
 use Laravel\Ai\Responses\FileResponse;
 use Laravel\Ai\Responses\StoredFileResponse;
 
@@ -16,6 +17,7 @@ class OpenAiFileGateway implements FileGateway
     use Concerns\CreatesOpenAiClient;
     use HandlesFailoverErrors;
     use PreparesStorableFiles;
+    use ValidatesResourceIds;
 
     /**
      * Get a file by its ID.
@@ -25,7 +27,7 @@ class OpenAiFileGateway implements FileGateway
         $response = $this->withErrorHandling(
             $provider->name(),
             fn () => $this->client($provider)
-                ->get("files/{$fileId}")
+                ->get("files/{$this->resourceId($fileId)}")
         );
 
         return new FileResponse(
@@ -67,7 +69,7 @@ class OpenAiFileGateway implements FileGateway
         $this->withErrorHandling(
             $provider->name(),
             fn () => $this->client($provider)
-                ->delete("files/{$fileId}")
+                ->delete("files/{$this->resourceId($fileId)}")
         );
     }
 
