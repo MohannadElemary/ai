@@ -10,6 +10,8 @@ beforeEach(function (): void {
         config(["ai.providers.{$provider}.key" => 'test-key']);
     }
 
+    config(['ai.providers.azure.key' => 'test-key', 'ai.providers.azure.url' => 'https://test-resource.openai.azure.com']);
+
     Http::fake();
 });
 
@@ -26,13 +28,13 @@ test('file ids must be a single path segment', function (string $provider, strin
     expect(fn () => Files::$operation($id, provider: $provider))->toThrow(InvalidArgumentException::class);
 
     Http::assertNothingSent();
-})->with(['openai', 'anthropic', 'openrouter', 'gemini'])->with(['get', 'delete'])->with('unsafe ids');
+})->with(['openai', 'azure', 'anthropic', 'openrouter', 'gemini'])->with(['get', 'delete'])->with('unsafe ids');
 
 test('store ids must be a single path segment', function (string $provider, string $operation, string $id): void {
     expect(fn () => Stores::$operation($id, provider: $provider))->toThrow(InvalidArgumentException::class);
 
     Http::assertNothingSent();
-})->with(['openai', 'gemini'])->with(['get', 'delete'])->with('unsafe ids');
+})->with(['openai', 'azure', 'gemini'])->with(['get', 'delete'])->with('unsafe ids');
 
 test('store document ids must be a single path segment', function (string $provider, string $id): void {
     $instance = app(AiManager::class)->instance($provider);
@@ -40,7 +42,7 @@ test('store document ids must be a single path segment', function (string $provi
     expect(fn () => $instance->storeGateway()->removeFile($instance, 'store123', $id))->toThrow(InvalidArgumentException::class);
 
     Http::assertNothingSent();
-})->with(['openai', 'gemini'])->with('unsafe ids');
+})->with(['openai', 'azure', 'gemini'])->with('unsafe ids');
 
 test('gemini resource ids cannot name a different resource through their prefix', function (string $operation, string $id): void {
     expect(fn () => match ($operation) {
