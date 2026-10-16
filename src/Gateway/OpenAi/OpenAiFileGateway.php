@@ -6,18 +6,18 @@ use Laravel\Ai\Contracts\Files\StorableFile;
 use Laravel\Ai\Contracts\Gateway\FileGateway;
 use Laravel\Ai\Contracts\Providers\FileProvider;
 use Laravel\Ai\Enums\Lab;
+use Laravel\Ai\Gateway\Concerns\EncodesResourceIds;
 use Laravel\Ai\Gateway\Concerns\HandlesFailoverErrors;
 use Laravel\Ai\Gateway\Concerns\PreparesStorableFiles;
-use Laravel\Ai\Gateway\Concerns\ValidatesResourceIds;
 use Laravel\Ai\Responses\FileResponse;
 use Laravel\Ai\Responses\StoredFileResponse;
 
 class OpenAiFileGateway implements FileGateway
 {
     use Concerns\CreatesOpenAiClient;
+    use EncodesResourceIds;
     use HandlesFailoverErrors;
     use PreparesStorableFiles;
-    use ValidatesResourceIds;
 
     /**
      * Get a file by its ID.

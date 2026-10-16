@@ -7,16 +7,16 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Laravel\Ai\Contracts\Gateway\StoreGateway;
 use Laravel\Ai\Contracts\Providers\StoreProvider;
+use Laravel\Ai\Gateway\Concerns\EncodesResourceIds;
 use Laravel\Ai\Gateway\Concerns\HandlesFailoverErrors;
-use Laravel\Ai\Gateway\Concerns\ValidatesResourceIds;
 use Laravel\Ai\Responses\Data\StoreFileCounts;
 use Laravel\Ai\Store;
 
 class OpenAiStoreGateway implements StoreGateway
 {
     use Concerns\CreatesOpenAiClient;
+    use EncodesResourceIds;
     use HandlesFailoverErrors;
-    use ValidatesResourceIds;
 
     /**
      * Get a vector store by its ID.

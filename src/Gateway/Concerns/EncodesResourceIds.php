@@ -4,19 +4,19 @@ namespace Laravel\Ai\Gateway\Concerns;
 
 use InvalidArgumentException;
 
-trait ValidatesResourceIds
+trait EncodesResourceIds
 {
     /**
-     * Ensure the given provider resource ID is a single URL path segment.
+     * Encode the given provider resource ID as a single URL path segment.
      *
      * @throws InvalidArgumentException
      */
     protected function resourceId(string $id): string
     {
-        if (preg_match('/^(?!\.{1,2}$)[A-Za-z0-9._~-]+$/', $id) !== 1) {
+        if (in_array($id, ['', '.', '..'], true)) {
             throw new InvalidArgumentException("[{$id}] is not a valid provider resource ID.");
         }
 
-        return $id;
+        return rawurlencode($id);
     }
 }
