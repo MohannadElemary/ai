@@ -20,7 +20,7 @@ class UntrustedUrl
 {
     protected const MAX_REDIRECTS = 5;
 
-    protected const MAX_KILOBYTES = 20 * 1024;
+    protected const MAX_KILOBYTES = 100 * 1024;
 
     protected const BLOCKED_HOSTS = ['localhost'];
 
@@ -35,7 +35,8 @@ class UntrustedUrl
      */
     public static function fetch(string $url): Response
     {
-        $limit = (int) config('ai.remote_files.max_size', static::MAX_KILOBYTES) * 1024;
+        $kilobytes = (int) config('ai.remote_files.max_size', static::MAX_KILOBYTES);
+        $limit = $kilobytes * 1024;
 
         for ($hop = 0; $hop <= static::MAX_REDIRECTS; $hop++) {
             $uri = new Uri($url);
@@ -67,7 +68,7 @@ class UntrustedUrl
                     ])
                     ->get($url);
             } catch (HttpClientException $e) {
-                throw $tooLarge ? new InvalidArgumentException("The remote file URL [{$uri}] exceeds the maximum size of {$limit} bytes.") : $e;
+                throw $tooLarge ? new InvalidArgumentException("The remote file URL [{$uri}] exceeds the maximum size of {$kilobytes} kilobytes.") : $e;
             }
 
             if (! $response->redirect() || blank($response->header('Location'))) {

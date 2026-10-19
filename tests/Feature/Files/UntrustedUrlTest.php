@@ -123,7 +123,7 @@ test('a body larger than the size limit is rejected', function (): void {
     });
 
     expect(fn () => (new RemoteImage('https://example.com/photo.png'))->content())
-        ->toThrow(InvalidArgumentException::class, 'exceeds the maximum size of 1024 bytes');
+        ->toThrow(InvalidArgumentException::class, 'exceeds the maximum size of 1 kilobytes');
 });
 
 test('a declared length larger than the size limit is rejected before the body is read', function (): void {
@@ -144,8 +144,23 @@ test('a declared length larger than the size limit is rejected before the body i
     });
 
     expect(fn () => (new RemoteImage('https://example.com/photo.png'))->content())
-        ->toThrow(InvalidArgumentException::class, 'exceeds the maximum size of 1024 bytes')
+        ->toThrow(InvalidArgumentException::class, 'exceeds the maximum size of 1 kilobytes')
         ->and($read)->toBeFalse();
+});
+
+test('the size limit defaults to 100 megabytes', function (): void {
+    Http::fake(function (Request $request, array $options) {
+        try {
+            $options['on_headers'](new Psr7Response(200, ['Content-Length' => (string) (100 * 1024 * 1024 + 1)]));
+        } catch (RuntimeException $e) {
+            throw new ConnectionException('An error was encountered during the on_headers event', 0, $e);
+        }
+
+        return Http::response('bytes');
+    });
+
+    expect(fn () => (new RemoteImage('https://example.com/photo.png'))->content())
+        ->toThrow(InvalidArgumentException::class, 'exceeds the maximum size of 102400 kilobytes');
 });
 
 test('a body within the size limit is fetched', function (): void {
