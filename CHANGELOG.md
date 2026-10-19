@@ -1,6 +1,36 @@
 # Release Notes
 
-## [Unreleased](https://github.com/laravel/ai/compare/v0.11.2...0.x)
+## [Unreleased](https://github.com/laravel/ai/compare/v0.11.3...0.x)
+
+## [v0.11.3](https://github.com/laravel/ai/compare/v0.11.2...v0.11.3) - 2026-10-19
+
+### What's Changed
+
+* Exclude cached tokens from the reported prompt token count on the Groq and OpenAI-compatible providers by [@sulimanbenhalim](https://github.com/sulimanbenhalim) in https://github.com/laravel/ai/pull/909
+* Accept every storable image type in OpenAI image edits by [@saifulferoz](https://github.com/saifulferoz) in https://github.com/laravel/ai/pull/893
+* Fix Gemini file import operation handling by [@drewmt](https://github.com/drewmt) in https://github.com/laravel/ai/pull/821
+* [0.x] Combine streamed text by step rather than by message ID by [@pascalbaljet](https://github.com/pascalbaljet) in https://github.com/laravel/ai/pull/987
+* [0.x] Add conversation pagination by [@pascalbaljet](https://github.com/pascalbaljet) in https://github.com/laravel/ai/pull/990
+* [0.x] Persist the sources a streamed answer cited by [@pascalbaljet](https://github.com/pascalbaljet) in https://github.com/laravel/ai/pull/991
+* [0.x] Expose the tool calls a paused conversation is waiting on by [@pascalbaljet](https://github.com/pascalbaljet) in https://github.com/laravel/ai/pull/992
+* [0.x] Expose whether a conversation belongs to a participant by [@pascalbaljet](https://github.com/pascalbaljet) in https://github.com/laravel/ai/pull/993
+* Read Cohere Bedrock embeddings input token count from response header by [@serpentblade](https://github.com/serpentblade) in https://github.com/laravel/ai/pull/914
+* Read the cumulative usage reported on Anthropic message_delta by [@goatrenterguy](https://github.com/goatrenterguy) in https://github.com/laravel/ai/pull/996
+* Fix xAI and OpenRouter dropping filename for unnamed documents by [@yognevoy](https://github.com/yognevoy) in https://github.com/laravel/ai/pull/1001
+* Add OpenRouter reranking support by [@ilogus](https://github.com/ilogus) in https://github.com/laravel/ai/pull/999
+* Unescape slashes when encoding structured MCP tool output by [@yognevoy](https://github.com/yognevoy) in https://github.com/laravel/ai/pull/997
+* feat: add audio input for OpenRouter by [@davidafsoty](https://github.com/davidafsoty) in https://github.com/laravel/ai/pull/998
+* Fix OpenRouter audio attachment content type check by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/ai/pull/1126
+* [0.x] Limit the size of fetched remote files by [@pushpak1300](https://github.com/pushpak1300) in https://github.com/laravel/ai/pull/1151
+
+### New Contributors
+
+* [@saifulferoz](https://github.com/saifulferoz) made their first contribution in https://github.com/laravel/ai/pull/893
+* [@goatrenterguy](https://github.com/goatrenterguy) made their first contribution in https://github.com/laravel/ai/pull/996
+* [@ilogus](https://github.com/ilogus) made their first contribution in https://github.com/laravel/ai/pull/999
+* [@davidafsoty](https://github.com/davidafsoty) made their first contribution in https://github.com/laravel/ai/pull/998
+
+**Full Changelog**: https://github.com/laravel/ai/compare/v0.11.2...v0.11.3
 
 ## [v0.11.2](https://github.com/laravel/ai/compare/v0.11.1...v0.11.2) - 2026-09-03
 
