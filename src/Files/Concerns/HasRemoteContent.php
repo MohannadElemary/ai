@@ -2,9 +2,15 @@
 
 namespace Laravel\Ai\Files\Concerns;
 
+use GuzzleHttp\Psr7\FnStream;
+use GuzzleHttp\Psr7\Utils;
+use Illuminate\Http\Client\HttpClientException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Stringable;
+use InvalidArgumentException;
+use Psr\Http\Message\ResponseInterface;
+use RuntimeException;
 
 trait HasRemoteContent
 {
@@ -46,10 +52,50 @@ trait HasRemoteContent
 
     /**
      * Get the HTTP response for the remote file.
+     *
+     * @throws InvalidArgumentException if the body exceeds the size limit.
      */
     protected function response(): Response
     {
-        return $this->response ??= Http::get($this->url)->throw();
+        return $this->response ??= $this->fetch();
+    }
+
+    /**
+     * Fetch the remote file, stopping once the body exceeds the size limit.
+     *
+     * @throws InvalidArgumentException if the body exceeds the size limit.
+     */
+    protected function fetch(): Response
+    {
+        $kilobytes = (int) config('ai.remote_files.max_size', 100 * 1024);
+        $limit = $kilobytes * 1024;
+        $body = Utils::streamFor();
+        $tooLarge = false;
+
+        try {
+            return Http::withOptions([
+                'on_headers' => function (ResponseInterface $response) use ($limit, &$tooLarge): void {
+                    if ((int) $response->getHeaderLine('Content-Length') > $limit) {
+                        $tooLarge = true;
+
+                        throw new RuntimeException('The remote file declares a body larger than the size limit.');
+                    }
+                },
+                'sink' => FnStream::decorate($body, [
+                    'write' => function (string $chunk) use ($body, $limit, &$tooLarge): int {
+                        if ($body->getSize() + strlen($chunk) > $limit) {
+                            $tooLarge = true;
+
+                            return 0;
+                        }
+
+                        return $body->write($chunk);
+                    },
+                ]),
+            ])->get($this->url)->throw();
+        } catch (HttpClientException $e) {
+            throw $tooLarge ? new InvalidArgumentException("The remote file URL [{$this->url}] exceeds the maximum size of {$kilobytes} kilobytes.") : $e;
+        }
     }
 
     public function __toString(): string
