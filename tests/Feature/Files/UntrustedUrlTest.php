@@ -112,7 +112,7 @@ test('too many redirects throws', function (): void {
 });
 
 test('a body larger than the size limit is rejected', function (): void {
-    config(['ai.remote_files.max_bytes' => 1024]);
+    config(['ai.remote_files.max_size' => 1]);
 
     Http::fake(function (Request $request, array $options) {
         if ($options['sink']->write(str_repeat('a', 1025)) === 0) {
@@ -127,7 +127,7 @@ test('a body larger than the size limit is rejected', function (): void {
 });
 
 test('a declared length larger than the size limit is rejected before the body is read', function (): void {
-    config(['ai.remote_files.max_bytes' => 1024]);
+    config(['ai.remote_files.max_size' => 1]);
 
     $read = false;
 
@@ -149,7 +149,7 @@ test('a declared length larger than the size limit is rejected before the body i
 });
 
 test('a body within the size limit is fetched', function (): void {
-    config(['ai.remote_files.max_bytes' => 1024]);
+    config(['ai.remote_files.max_size' => 1]);
 
     Http::fake(function (Request $request, array $options) {
         $options['on_headers'](new Psr7Response(200, ['Content-Length' => '1024']));
