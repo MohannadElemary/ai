@@ -224,7 +224,7 @@ class AgentUserInteractionProtocol extends StreamProtocol
             'runId' => $this->runId,
             ...$messageIds,
             ...$attributes,
-            ...($messageIds ? ['metadata' => [...$messageIds, ...($attributes['metadata'] ?? [])]] : []),
+            ...($messageIds ? ['metadata' => [...($attributes['metadata'] ?? []), ...$messageIds]] : []),
         ];
     }
 
